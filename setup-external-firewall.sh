@@ -11,8 +11,16 @@ subnetcidr="10.1.1.0/24"
 acaenv="$rg-acaenv"
 internal=false
 
-# creates RG, VNet, ACA env, and subnet
+# creates RG, VNet and subnet
 source ./acacore.sh
+
+az containerapp env create \
+  --resource-group $rg \
+  --location $location \
+  --name $acaenv \
+  --enable-workload-profiles \
+  --infrastructure-subnet-resource-id "$subnetid" \
+  --internal-only $internal
 
 az containerapp create \
   --resource-group $rg \

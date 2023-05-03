@@ -1,5 +1,4 @@
-# internal facing aca v2 with container deployed to consumption profile
-set -e
+# external facing aca v1
 
 location=australiaeast
 rg=aca-wlp-test-v1
@@ -11,24 +10,8 @@ subnetcidr="10.3.0.0/23"
 acaenv="$rg-acaenv"
 internal=false
 
-az group create \
-  --resource-group $rg \
-  --location $location \
-  --tags "demogroup=aca-wlp"
-
-az network vnet create \
-  --resource-group $rg \
-  --location $location \
-  --address-prefixes $vnetcidr \
-  --name $vnet
-
-az network vnet subnet create \
-  --resource-group $rg \
-  --vnet-name $vnet \
-  --name $subnet \
-  --address-prefixes $subnetcidr 
-
-subnetid=$(az network vnet subnet list --resource-group $rg --vnet-name $vnet --query "[?name=='$subnet'].id" -o tsv)
+# creates RG, VNet and subnet
+source ./acacore.sh
 
 az containerapp env create \
   --resource-group $rg \

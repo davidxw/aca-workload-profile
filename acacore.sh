@@ -18,10 +18,3 @@ az network vnet subnet create \
 
 subnetid=$(az network vnet subnet list --resource-group $rg --vnet-name $vnet --query "[?name=='$subnet'].id" -o tsv)
 
-az containerapp env create \
-  --resource-group $rg \
-  --location $location \
-  --name $acaenv \
-  --enable-workload-profiles \
-  --infrastructure-subnet-resource-id "$subnetid" \
-  --internal-only $internal
