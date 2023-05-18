@@ -1,4 +1,4 @@
-set -e
+#set -e
 
 # internal facing aca v2 with container deployed to consumption profile.  ACA has custom suffix and private DNS.
 # then create a second app environment with external access which can be used to access/test the internal app using
@@ -30,6 +30,7 @@ az containerapp env create \
   --custom-domain-dns-suffix "acatest.internal.com"
 
 caprivateip=$(az containerapp env show -n $acaenv -g $rg --query properties.staticIp -o tsv)
+cadefaultdomain=$(az containerapp env show -n $acaenv -g $rg --query properties.defaultDomain -o tsv)
 
 az containerapp create \
   --resource-group $rg \
@@ -40,7 +41,7 @@ az containerapp create \
   --image docker.io/davidxw/webtest:latest \
   --workload-profile-name "Consumption"  
 
-# private DNS
+# private DNS for custom domain
 
 az network private-dns zone create \
     --resource-group $rg \
@@ -56,6 +57,25 @@ az network private-dns link vnet create \
   --resource-group $rg \
   --name $vnet \
   --zone-name $privateDnsName \
+  --virtual-network $vnet \
+  --registration-enabled false
+
+# private DNS for default domain - required for internal apps
+
+az network private-dns zone create \
+    --resource-group $rg \
+    --name $cadefaultdomain
+
+az network private-dns record-set a add-record \
+    --resource-group $rg \
+    --record-set-name "*" \
+    --zone-name $cadefaultdomain \
+    --ipv4-address $caprivateip
+
+az network private-dns link vnet create \
+  --resource-group $rg \
+  --name $vnet \
+  --zone-name $cadefaultdomain \
   --virtual-network $vnet \
   --registration-enabled false
 
