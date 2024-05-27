@@ -13,7 +13,7 @@ az network vnet subnet create \
   --resource-group $rg \
   --vnet-name $vnet \
   --name $subnet \
-  --address-prefixes $subnetcidr \
+  --address-prefix $subnetcidr \
   --delegations Microsoft.App/environments
 
 subnetid=$(az network vnet subnet list --resource-group $rg --vnet-name $vnet --query "[?name=='$subnet'].id" -o tsv)

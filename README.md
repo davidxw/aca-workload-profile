@@ -1,2 +1,2 @@
 # aca-workload-profile
-Scripts to create sample AVA workload profile deployments.
+Scripts to create sample ACA workload profile deployments.

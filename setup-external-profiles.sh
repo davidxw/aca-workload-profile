@@ -1,8 +1,8 @@
 # external facing aca v2 with container deployed to a Dedicated-D8 workload profile
 set -e
 
-location=eastus
-rg=aca-wlp-test-profiles
+location=australiaEast
+rg=wx-aca-test-profiles
 vnet="$rg-vnet"
 vnetcidr="10.1.0.0/16"
 caname1="webtest-ext1"
@@ -11,9 +11,15 @@ subnet="aca-external"
 subnetcidr="10.1.1.0/24"
 acaenv="$rg-acaenv"
 internal=false
+la="$rg-la"
 
 # creates RG, VNet and subnet
 source ./acacore.sh
+
+az monitor log-analytics workspace create -g $rg -n $la
+
+la_id=$(az monitor log-analytics workspace show --name $la --resource-group $rg --query id -o tsv)
+la_key=$(az monitor log-analytics workspace get-shared-keys --resource-group $rg --workspace-name $la --query primarySharedKey -o tsv)
 
 az containerapp env create \
   --resource-group $rg \
@@ -21,7 +27,9 @@ az containerapp env create \
   --name $acaenv \
   --enable-workload-profiles \
   --infrastructure-subnet-resource-id "$subnetid" \
-  --internal-only $internal
+  --internal-only $internal \
+  --logs-workspace-id "$la_id" \
+  --logs-workspace-key $la_key
 
 az containerapp env workload-profile set \
   --resource-group $rg \
