@@ -30,3 +30,10 @@ openssl x509 -in $server.crt -text -noout
 
 # server - combine key and cert
 openssl pkcs12 -export -out $server.pfx -inkey $server.key -in $server.crt
+
+# server - combine key and cert
+openssl pkcs12 -export -out $server.pem -inkey $server.key -in $server.crt
+
+# server - export as cer
+openssl pkcs12 -in $server.pfx -out $server.pem -nodes
+
