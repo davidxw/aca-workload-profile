@@ -2,10 +2,6 @@ param acaenvInternalDefaultDomain string
 param acaenvInternalStaticIp string
 param vnet string
 
-var custom_domain_name='acatest.internal.com'
-var custom_domain_certificate_password = 'P@ssword1234'
-var custom_domain_cert = loadFileAsBase64('acatest.internal.com.pem')
-
 resource wxacatestprofilesvnet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vnet
 }
@@ -31,7 +27,7 @@ resource privateDNSlink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2
   }
 }
 
-//a record for internal container app in private DNS zone
+// A record for internal container app in private DNS zone
 resource aRecordDefaultDomain 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
   name: '*'
   parent: privateDNSdefaultDomain

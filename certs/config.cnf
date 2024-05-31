@@ -1,0 +1,16 @@
+[server-cert]
+keyUsage = critical, digitalSignature, keyEncipherment, keyAgreement
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_name
+
+[req]
+distinguished_name = dn
+prompt = no
+
+[dn]
+C = AU
+O = Contoso
+CN = *.acatest.internal.com
+
+[alt_name]
+DNS.1 = acatest.internal.com

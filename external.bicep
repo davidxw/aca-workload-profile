@@ -24,6 +24,10 @@ var laws = '${rg}-la'
 
 var location = resourceGroup().location
 
+var custom_domain_name='acatest.internal.com'
+var custom_domain_certificate_password = 'P@ssword1234'
+var custom_domain_cert = loadFileAsBase64('acatest.internal.com.pfx')
+
 // Virtual network
 resource wxacatestprofilesvnet 'Microsoft.Network/virtualNetworks@2023-11-01' = {
   name: vnet
@@ -123,6 +127,11 @@ resource wxacatestprofilesacaenv_internal 'Microsoft.App/managedEnvironments@202
         customerId: wxacatestprofilesla.properties.customerId
         sharedKey: wxacatestprofilesla.listKeys().primarySharedKey
       }
+    }
+    customDomainConfiguration: {
+      certificatePassword: custom_domain_certificate_password
+      certificateValue: custom_domain_cert
+      dnsSuffix: custom_domain_name
     }
     workloadProfiles: [
       {
