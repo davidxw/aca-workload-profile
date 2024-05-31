@@ -235,6 +235,7 @@ module external_private_dns 'external_private_dns.bicep' = {
     vnet: vnet
     acaenvInternalDefaultDomain: wxacatestprofilesacaenv_internal.properties.defaultDomain
     acaenvInternalStaticIp: wxacatestprofilesacaenv_internal.properties.staticIp
+    acaenvInternalCustomDomain: custom_domain_name
 
   }
 }
