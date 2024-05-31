@@ -15,16 +15,12 @@ var subnetInternal = 'aca-internal'
 var subnetInternalCidr = '10.1.2.0/24'
 
 var acaenv = '${rg}-acaenv'
-var avaenvInternal = '${rg}-acaenv-internal'
+var acaenvInternal = '${rg}-acaenv-internal'
 
 var workloadProfileName = 'x4Core16Mem'
 var workloadProfileType = 'D4'
 
 var laws = '${rg}-la'
-
-var custom_domain_name='acatest.internal.com'
-var custom_domain_certificate_password = 'P@ssword1234'
-var custom_domain_cert = loadFileAsBase64('acatest.internal.com.pem')
 
 var location = resourceGroup().location
 
@@ -114,7 +110,7 @@ resource wxacatestprofilesacaenv 'Microsoft.App/managedEnvironments@2024-03-01' 
 
 // Internal ACA environment
 resource wxacatestprofilesacaenv_internal 'Microsoft.App/managedEnvironments@2024-03-01' = {
-  name: avaenvInternal
+  name: acaenvInternal
   location: location
   properties: {
     vnetConfiguration: {
@@ -134,32 +130,9 @@ resource wxacatestprofilesacaenv_internal 'Microsoft.App/managedEnvironments@202
         name: 'Consumption'
       }
     ]
-    // customDomainConfiguration: {
-    //   certificatePassword: custom_domain_certificate_password
-    //   certificateValue: custom_domain_cert
-    //   dnsSuffix: custom_domain_name
-    // }
   }
 }
 
-// Private DNS Zones for internal ACA environment - custom 
-resource privateDNScustomDomain 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: custom_domain_name
-  location: 'global'
-}
-
-// link private dns to vnet
-resource privateDNSlink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: wxacatestprofilesvnet.name
-  location: 'global'
-  parent: privateDNScustomDomain
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: wxacatestprofilesvnet.id
-    }
-  }
-}
 
 // Container app, external ACA, public ingress
 resource webtestext 'Microsoft.App/containerApps@2024-03-01' = {
@@ -246,15 +219,13 @@ resource webtestext1_internal 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
-// a record for internal container app in private DNS zone
-// resource aRecordCustomDomain 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
-//   name: '*'
-//   parent: privateDNScustomDomain
-//   properties: {
-//     aRecords: [
-//       {
-//         ipv4Address: wxacatestprofilesacaenv_internal.properties.staticIp
-//       }
-//     ]
-//   }
-// }
+// create a bicepo module to deploy resources in external_private_dns.bicep
+module external_private_dns 'external_private_dns.bicep' = {
+  name: 'external_private_dns'
+  params: {
+    vnet: vnet
+    acaenvInternalDefaultDomain: wxacatestprofilesacaenv_internal.properties.defaultDomain
+    acaenvInternalStaticIp: wxacatestprofilesacaenv_internal.properties.staticIp
+
+  }
+}
