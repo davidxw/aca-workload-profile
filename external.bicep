@@ -41,7 +41,7 @@ resource wxacatestprofilesvnet 'Microsoft.Network/virtualNetworks@2023-11-01' = 
   }
 }
 
-// Subnet for external AVA environment
+// Subnet for external ACA environment
 resource wxacatestprofilesvnet_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
   name: subnet
   parent: wxacatestprofilesvnet
