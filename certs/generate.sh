@@ -31,5 +31,6 @@ openssl x509 -in ./output/$server.crt -text -noout
 # server - combine key and cert
 openssl pkcs12 -export -out ./output/$server.pfx -inkey ./output/$server.key -in ./output/$server.crt
 
+# copy the pfx to the root directory for bicep deployment
 cp ./output/$server.pfx ../acatest.internal.com.pfx
 
